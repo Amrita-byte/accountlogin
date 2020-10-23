@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: accountlogin
+  profiles:
+    active: dev
+  
