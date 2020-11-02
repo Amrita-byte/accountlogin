@@ -8,10 +8,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.ibm.msreskill.accountloginms.config.JwtTokenUtil;
 import com.ibm.msreskill.accountloginms.model.AccountInfo;
 import com.ibm.msreskill.accountloginms.model.JWTReqwUserAccountInfo;
 import com.ibm.msreskill.accountloginms.model.UserInfo;
@@ -38,6 +41,12 @@ public class AccountLoginService {
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
+	
+	@Autowired
+	JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+	JwtUserDetailsService jwtUserDetailsService;
 	
 	
 	
@@ -111,6 +120,14 @@ public class AccountLoginService {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}	
 		
+	}
+	
+	public Boolean validateToken(@RequestBody String jwtToken) 
+			throws Exception {
+		
+		UserDetails userDetails = 
+				jwtUserDetailsService.loadUserByUsername(jwtTokenUtil.getUsernameFromToken(jwtToken));
+		return jwtTokenUtil.validateToken(jwtToken, userDetails);
 	}
 
 	public JWTReqwUserAccountInfo authenticateTest(JWTReqwUserAccountInfo userAccountInfo) {

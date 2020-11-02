@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -87,6 +88,31 @@ public class AccountLoginController {
 		UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtReqwUserAccountInfo.getUsername());
 		final String token = jwtTokenUtil.generateToken(userDetails);
 		return ResponseEntity.ok(new JwtReswToken(token));
+	}
+	
+	@RequestMapping(value = "/validateJwtReswToken", method = RequestMethod.POST)
+	public Boolean validateJwtReswToken(@RequestBody JwtReswToken jwtReswToken) 
+			throws Exception {
+		
+		String jwtToken = jwtReswToken.getToken();
+		return accountLoginService.validateToken(jwtToken);
+	}
+	@RequestMapping(value = "/validateToken", method = RequestMethod.POST)
+	public Boolean validateHeaderToken(@RequestHeader("Authorization") String jwtToken) 
+			throws Exception {
+		//String token = httpRequest.getHeader("Authorization");
+		if (jwtToken != null && jwtToken.startsWith("Bearer")) {
+			jwtToken = jwtToken.substring(7);
+		System.out.println("jwtToken"+ jwtToken);	
+		}
+		return accountLoginService.validateToken(jwtToken);
+		
+	}
+	
+	@RequestMapping(value = "/validateStringToken", method = RequestMethod.POST)
+	public Boolean validateToken(@RequestBody String jwtToken) 
+			throws Exception {
+		return accountLoginService.validateToken(jwtToken);
 	}
 	
 	
